@@ -26,8 +26,9 @@ steps:
 
 
 - bash: |
-    ./azcopy --version
+    azcopy --version
   displayName: 'Bash'  
+
 
 
 # Install the Az PowerShell modules our script will need
