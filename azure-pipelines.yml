@@ -37,7 +37,7 @@ steps:
 - task: AzurePowerShell@4
   displayName: Order or Renew Certificate
   inputs:
-    azureSubscription: 'ACME Certificate Automation'
+    azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
     scriptType: 'FilePath'
     scriptPath: 'New-AcmeCertificate.ps1 '
     scriptArguments: '-AcmeDirectory "$(AcmeDirectory)" -AcmeContact "$(AcmeContact)" -CertificateNames "$(CertificateNames)" -StorageContainerSASToken "$(StorageContainerSASToken)"'
@@ -49,7 +49,7 @@ steps:
 - task: AzurePowerShell@4
   displayName: Import Certificate into Key Vault
   inputs:
-    azureSubscription: 'ACME Certificate Automation'
+    azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
     scriptType: 'FilePath'
     scriptPath: 'Import-AcmeCertificateToKeyVault.ps1 '
     scriptArguments: '-CertificateNames "$(CertificateNames)" -KeyVaultResourceId "$(KeyVaultResourceId)"'
