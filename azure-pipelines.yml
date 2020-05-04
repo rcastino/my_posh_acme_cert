@@ -18,7 +18,6 @@ steps:
   
 # Install AzCopy v10
 - task: Bash@3
-  condition: false
   displayName: "Install AzCopy v10"
   inputs:
     targetType: 'inline'
