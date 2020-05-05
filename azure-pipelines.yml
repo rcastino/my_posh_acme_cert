@@ -26,6 +26,7 @@ steps:
 
 - pwsh: |
     ./azcopy --version
+    Get-AzKeyVaultCertificate -VaultName $keyVaultName -Name "*"
   displayName: 'azcopy --version'  
 
 
