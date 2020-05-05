@@ -42,8 +42,18 @@ steps:
 
 - pwsh: |
     ./azcopy --version
-    Get-AzKeyVaultCertificate -VaultName "kv-rayshark-acmecerts" -Name "*"
   displayName: 'azcopy --version' 
+
+
+- task: AzurePowerShell@4
+  displayName: Get all Certificate
+  inputs:
+    azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+    ScriptType: 'InlineScript'
+    Inline: 'Get-AzKeyVaultCertificate -VaultName "kv-rayshark-acmecerts" -Name "*"'
+    azurePowerShellVersion: 'LatestVersion'
+
+
 
 
 # Order or renew a certificate via ACME
