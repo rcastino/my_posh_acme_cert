@@ -46,12 +46,21 @@ steps:
 
 
 - task: AzurePowerShell@4
-  displayName: Get all Certificate
+  displayName: Get all Certificate using PowerShell cmdlet
   inputs:
     azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
     ScriptType: 'InlineScript'
     Inline: 'Get-AzKeyVaultCertificate -VaultName "kv-rayshark-acmecerts" -Name "*"'
     azurePowerShellVersion: 'LatestVersion'
+
+# Azure Key Vault
+# Download Azure Key Vault secrets
+- task: AzureKeyVault@1
+  displayName: Get all Certificate using task
+  inputs:
+    azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+    keyVaultName: 'kv-rayshark-acmecerts'
+    secretsFilter: '*'
 
 
 
