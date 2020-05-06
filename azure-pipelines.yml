@@ -64,8 +64,7 @@ steps:
 
 
 - pwsh: |
-    echo $io-ainzara-it
-    echo $env:io-ainzara-it
+    echo $(io-ainzara-it)
   displayName: 'ECHO io-ainzara-it' 
 
 
