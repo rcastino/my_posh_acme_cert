@@ -65,9 +65,9 @@ steps:
 
 - pwsh: |
     echo $(io-ainzara-it)
-    $kvSecretBytes = [System.Convert]::FromBase64String($(PfxSecret))
-    $certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-    $certCollection.Import($kvSecretBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
+    #$kvSecretBytes = [System.Convert]::FromBase64String($(PfxSecret))
+    #$certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
+    #$certCollection.Import($kvSecretBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
   displayName: 'ECHO io-ainzara-it' 
 
 
