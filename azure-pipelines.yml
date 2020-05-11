@@ -2,14 +2,14 @@
 # Let’s Encrypt.
 #
 # To enable the deployment in any environment you need to configure the following 
-# global variable otherwise all the deployment jobs will be always skipped:
+# global variable otherwise all the jobs will be skipped:
 # - DO_RENEW_CERT = true
-# The following parameter needs also to be set to identify the environment which
+# The following parameter needs to be set to identify the environment for which
 # should be ordered or renewed a certificate via ACME:
-# - 
+# - ENVIRONMENT: TEST | PRODUCTION
 #
-# The following parameters and variables are used to configure the settings for
-# connecting to the environment to deploy and managing the deployment methods:
+# The following pipeline variables have to be added and configured based on the
+# environment:
 # - PRODUCTION_AZURE_SUBSCRIPTION: service connection name
 # - PRODUCTION_AcmeContact: email which should be notified before cert expire
 # - PRODUCTION_AcmeDirectory: LE_STAGE | LE_PROD
@@ -22,8 +22,7 @@
 # - TEST_AcmeDirectory: LE_STAGE | LE_PROD
 # - TEST_CertificateNames: comma-separated list of domain names 
 # - TEST_KeyVaultResourceId: resource ID of the key vault 
-# - TEST_StorageContainerSASToken: SAS token for the storage container
-
+# - TEST_StorageContainerSASToken: SAS token for the storage container  
 
 parameters:
   - name: 'ENVIRONMENT'
@@ -84,10 +83,10 @@ jobs:
       - task: AzurePowerShell@4
         displayName: Order or Renew Certificate
         inputs:
-          azureSubscription: '$(STAGE_AZURE_SUBSCRIPTION)'
+          azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
           scriptType: 'FilePath'
           scriptPath: 'New-AcmeCertificate.ps1 '
-          scriptArguments: '-AcmeDirectory "$(AcmeDirectory)" -AcmeContact "$(AcmeContact)" -CertificateNames "$(CertificateNames)" -StorageContainerSASToken "$(StorageContainerSASToken)"'
+          scriptArguments: '-AcmeDirectory "$(TEST_AcmeDirectory)" -AcmeContact "$(TEST_AcmeContact)" -CertificateNames "$(TEST_CertificateNames)" -StorageContainerSASToken "$(TEST_StorageContainerSASToken)"'
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
@@ -96,14 +95,14 @@ jobs:
       - task: AzurePowerShell@4
         displayName: Import Certificate into Key Vault
         inputs:
-          azureSubscription: '$(STAGE_AZURE_SUBSCRIPTION)'
+          azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
           scriptType: 'FilePath'
           scriptPath: 'Import-AcmeCertificateToKeyVault.ps1 '
-          scriptArguments: '-CertificateNames "$(CertificateNames)" -KeyVaultResourceId "$(KeyVaultResourceId)"'
+          scriptArguments: '-CertificateNames "$(TEST_CertificateNames)" -KeyVaultResourceId "$(TEST_KeyVaultResourceId)"'
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
-        condition: "and(succeeded(), ne(variables['KeyVaultResourceId'], ''))"
+        condition: "and(succeeded(), ne(variables['TEST_KeyVaultResourceId'], ''))"
 
 
 
@@ -118,7 +117,7 @@ jobs:
         condition: false
         displayName: Get all Certificate using PowerShell cmdlet
         inputs:
-          azureSubscription: '$(STAGE_AZURE_SUBSCRIPTION)'
+          azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
           ScriptType: 'InlineScript'
           Inline: 'Get-AzKeyVaultCertificate -VaultName "kv-rayshark-acmecerts" -Name "*"'
           azurePowerShellVersion: 'LatestVersion'
@@ -129,7 +128,7 @@ jobs:
         displayName: Get all Certificate using task
         condition: false
         inputs:
-          azureSubscription: '$(STAGE_AZURE_SUBSCRIPTION)'
+          azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
           keyVaultName: 'kv-rayshark-acmecerts'
           secretsFilter: '*'
 
