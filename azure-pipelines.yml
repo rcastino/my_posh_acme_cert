@@ -1,21 +1,42 @@
-parameters:
-  - name: 'STAGE_ENABLE'
-    displayName: 'Enable order or renew of certificate in stage environment'
-    type: boolean
-    default: true
+# Azure DevOps pipeline for automating certificate management with Azure and 
+# Let’s Encrypt.
+#
+# To enable the deployment in any environment you need to configure the following 
+# global variable otherwise all the deployment jobs will be always skipped:
+# - DO_RENEW_CERT = true
+# The following parameter needs also to be set to identify the environment which
+# should be ordered or renewed a certificate via ACME:
+# - 
+#
+# The following parameters and variables are used to configure the settings for
+# connecting to the environment to deploy and managing the deployment methods:
+# - PRODUCTION_AZURE_SUBSCRIPTION: service connection name
+# - PRODUCTION_AcmeContact: email which should be notified before cert expire
+# - PRODUCTION_AcmeDirectory: LE_STAGE | LE_PROD
+# - PRODUCTION_CertificateNames: comma-separated list of domain names 
+# - PRODUCTION_KeyVaultResourceId: resource ID of the key vault 
+# - PRODUCTION_StorageContainerSASToken: SAS token for the storage container
+#
+# - TEST_AZURE_SUBSCRIPTION: service connection name for test only
+# - TEST_AcmeContact: email which should be notified before cert expire
+# - TEST_AcmeDirectory: LE_STAGE | LE_PROD
+# - TEST_CertificateNames: comma-separated list of domain names 
+# - TEST_KeyVaultResourceId: resource ID of the key vault 
+# - TEST_StorageContainerSASToken: SAS token for the storage container
 
-  - name: 'PROD_ENABLE'
-    displayName: 'Enable order or renew of certificate in production environment'
-    type: boolean
-    default: false
+
+parameters:
+  - name: 'ENVIRONMENT'
+    displayName: 'Select the environment for which renew the certificate:'
+    type: string
+    default: TEST
+    values:
+      - TEST  
+      - PRODUCTION
 
 variables:
-  - name: DO_ORDER_RENEW_CERT_STAGE
-    value: ${{ parameters.STAGE_ENABLE }}  
-  - name: DO_ORDER_RENEW_CERT_PROD
-    value: ${{ parameters.PROD_ENABLE }}  
-
-
+  - name: RENEW_CERT_ENV
+    value: ${{ parameters.ENVIRONMENT }}  
 
 # Linux based agent; all except the first step will also work on Windows
 pool:
@@ -24,10 +45,16 @@ pool:
 # The scheduled trigger will be set in the Azure DevOps portal
 trigger: none
 
-
 jobs:
   - job: renew_cert_stage
-    condition: and(succeeded(), eq(variables['DO_ORDER_RENEW_CERT_STAGE'], true))
+    condition: 
+      and(
+        succeeded(),
+        and(
+          eq(variables['DO_RENEW_CERT'], true),
+          eq(variables['RENEW_CERT_ENV'], 'TEST')
+        )
+      )
     steps:
       # 1. Set the number of the build
       - task: PowerShell@2
