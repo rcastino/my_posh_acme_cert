@@ -91,7 +91,7 @@ jobs:
         condition: false
         displayName: Get all Certificate using PowerShell cmdlet
         inputs:
-          azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+          azureSubscription: '$(STAGE_AZURE_SUBSCRIPTION)'
           ScriptType: 'InlineScript'
           Inline: 'Get-AzKeyVaultCertificate -VaultName "kv-rayshark-acmecerts" -Name "*"'
           azurePowerShellVersion: 'LatestVersion'
@@ -102,7 +102,7 @@ jobs:
         displayName: Get all Certificate using task
         condition: false
         inputs:
-          azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+          azureSubscription: '$(STAGE_AZURE_SUBSCRIPTION)'
           keyVaultName: 'kv-rayshark-acmecerts'
           secretsFilter: '*'
 
