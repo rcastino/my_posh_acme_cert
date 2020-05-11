@@ -2,7 +2,7 @@ parameters:
   - name: 'STAGE_ENABLE'
     displayName: 'Enable order or renew of certificate in stage environment'
     type: boolean
-    default: false
+    default: true
 
   - name: 'PROD_ENABLE'
     displayName: 'Enable order or renew of certificate in production environment'
