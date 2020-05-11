@@ -45,7 +45,7 @@ pool:
 trigger: none
 
 jobs:
-  - job: renew_cert_stage
+  - job: renew_cert_test
     condition: 
       and(
         succeeded(),
