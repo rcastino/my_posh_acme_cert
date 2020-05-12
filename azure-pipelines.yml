@@ -64,14 +64,14 @@ jobs:
 
 
       - bash: |
-          echo "##vso[task.setvariable variable=CIAO]$TEST_ACMECONTACT"
+          echo "##vso[task.setvariable variable=TEST_AZURE_SUBSCRIPTION]$TEST_ACMECONTACT"
         displayName: 'SET' 
         condition: true
 
       - bash: |
-          echo $env:CIAO
-          echo $(CIAO)
-          echo $CIAO
+          echo $env:TEST_AZURE_SUBSCRIPTION
+          echo $(TEST_AZURE_SUBSCRIPTION)
+          echo $TEST_AZURE_SUBSCRIPTION
         displayName: 'PRINT' 
         condition: true
 
