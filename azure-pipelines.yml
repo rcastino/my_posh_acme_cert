@@ -60,8 +60,17 @@ jobs:
         displayName: Update Build Number
         inputs:
           targetType: 'inline'
-          script: '$id = "$(Build.BuildId)"; $date = Get-Date -Format "yyyy.MMdd"; Write-Host "##vso[build.updatebuildnumber]$date.$id"'
-        
+          script: '$id = "$(Build.BuildId)"; $date = Get-Date -Format "yyyy.MMdd"; Write-Host "##vso[build.updatebuildnumber]$date.$id"; Write-Host "##vso[DO_RENEW_CERT]false"'
+
+
+      - pwsh: |
+          echo $env:DO_RENEW_CERT
+          echo $(DO_RENEW_CERT)
+          echo $DO_RENEW_CERT
+        displayName: 'PRINT' 
+        condition: true
+
+
       # 2. Install AzCopy v10 (min version required: build agents run an older version)
       - task: Bash@3
         displayName: "Install AzCopy v10"
