@@ -45,15 +45,8 @@ pool:
 trigger: none
 
 jobs:
-  - job: renew_cert_test
-    condition: 
-      and(
-        succeeded(),
-        and(
-          eq(variables['DO_RENEW_CERT'], true),
-          eq(variables['RENEW_CERT_ENV'], 'TEST')
-        )
-      )
+  - job: certificate_management 
+    condition: and(succeeded(), eq(variables['DO_RENEW_CERT'], true))
     steps:
       # 1. Set the number of the build
       - task: PowerShell@2
@@ -61,20 +54,6 @@ jobs:
         inputs:
           targetType: 'inline'
           script: '$id = "$(Build.BuildId)"; $date = Get-Date -Format "yyyy.MMdd"; Write-Host "##vso[build.updatebuildnumber]$date.$id"'
-
-
-      - bash: |
-          echo "##vso[task.setvariable variable=TEST_AZURE_SUBSCRIPTION]$TEST_ACMECONTACT"
-        displayName: 'SET' 
-        condition: true
-
-      - bash: |
-          echo $env:TEST_AZURE_SUBSCRIPTION
-          echo $(TEST_AZURE_SUBSCRIPTION)
-          echo $TEST_AZURE_SUBSCRIPTION
-        displayName: 'PRINT' 
-        condition: true
-
 
       # 2. Install AzCopy v10 (min version required: build agents run an older version)
       - task: Bash@3
@@ -161,6 +140,25 @@ jobs:
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
 
+
+
+
+
+
+
+
+
+      - bash: |
+          echo "##vso[task.setvariable variable=TEST_AZURE_SUBSCRIPTION]$TEST_ACMECONTACT"
+        displayName: 'SET' 
+        condition: false
+
+      - bash: |
+          echo $env:TEST_AZURE_SUBSCRIPTION
+          echo $(TEST_AZURE_SUBSCRIPTION)
+          echo $TEST_AZURE_SUBSCRIPTION
+        displayName: 'PRINT' 
+        condition: false
 
 
       - pwsh: |
