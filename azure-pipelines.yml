@@ -95,7 +95,8 @@ jobs:
 
       # 4. Order or renew a certificate via ACME
       - task: AzurePowerShell@4
-        displayName: Order or Renew Certificate
+        displayName: 'TEST - Order or Renew Certificate'
+        condition: and(succeeded(), eq(variables['RENEW_CERT_ENV'], 'TEST'))
         inputs:
           azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
           scriptType: 'FilePath'
@@ -107,7 +108,7 @@ jobs:
 
       # 5. Import the certificate into Azure Key Vault
       - task: AzurePowerShell@4
-        displayName: Import Certificate into Key Vault
+        displayName: 'TEST - Import Certificate into Key Vault'
         inputs:
           azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
           scriptType: 'FilePath'
@@ -116,8 +117,14 @@ jobs:
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
-        condition: "and(succeeded(), ne(variables['TEST_KeyVaultResourceId'], ''))"
-
+        condition:
+          and(
+            succeeded(),
+            and(
+              ne(variables['TEST_KeyVaultResourceId'], ''),
+              eq(variables['RENEW_CERT_ENV'], 'TEST')
+            )
+          )
 
 
 
@@ -125,7 +132,7 @@ jobs:
       - pwsh: |
           ./azcopy --version
         displayName: 'azcopy --version' 
-        condition: false
+        condition: true
 
       - task: AzurePowerShell@4
         condition: false
