@@ -1,8 +1,8 @@
 # Azure DevOps pipeline for automating certificate management with Azure and 
 # Let’s Encrypt.
 #
-# To enable the deployment in any environment you need to configure the following 
-# global variable otherwise all the jobs will be skipped:
+# To enable the certificate management in any environment you need to add and set
+# this global variable otherwise the pipeline job will be skipped:
 # - DO_RENEW_CERT = true
 # The following parameter needs to be set to identify the environment for which
 # should be ordered or renewed a certificate via ACME:
