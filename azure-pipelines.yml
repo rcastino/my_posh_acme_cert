@@ -93,7 +93,42 @@ jobs:
           failOnStderr: true
           pwsh: true
 
-      # 4. Order or renew a certificate via ACME
+
+      # 4.1 Order or renew a certificate via ACME in PRODUCTION env
+      - task: AzurePowerShell@4
+        displayName: 'PROD - Order or Renew Certificate'
+        condition: and(succeeded(), eq(variables['RENEW_CERT_ENV'], 'PRODUCTION'))
+        inputs:
+          azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+          scriptType: 'FilePath'
+          scriptPath: 'New-AcmeCertificate.ps1 '
+          scriptArguments: '-AcmeDirectory "$(PRODUCTION_AcmeDirectory)" -AcmeContact "$(PRODUCTION_AcmeContact)" -CertificateNames "$(PRODUCTION_CertificateNames)" -StorageContainerSASToken "$(PRODUCTION_StorageContainerSASToken)"'
+          errorActionPreference: 'stop'
+          failOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
+
+      # 4.2 Import the certificate into Azure Key Vault in PRODUCTION env
+      - task: AzurePowerShell@4
+        displayName: 'PROD - Import Certificate into Key Vault'
+        condition:
+          and(
+            succeeded(),
+            and(
+              ne(variables['PRODUCTION_KeyVaultResourceId'], ''),
+              eq(variables['RENEW_CERT_ENV'], 'PRODUCTION')
+            )
+          )
+        inputs:
+          azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+          scriptType: 'FilePath'
+          scriptPath: 'Import-AcmeCertificateToKeyVault.ps1 '
+          scriptArguments: '-CertificateNames "$(PRODUCTION_CertificateNames)" -KeyVaultResourceId "$(PRODUCTION_KeyVaultResourceId)"'
+          errorActionPreference: 'stop'
+          failOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
+
+
+      # 5.1 Order or renew a certificate via ACME in TEST env
       - task: AzurePowerShell@4
         displayName: 'TEST - Order or Renew Certificate'
         condition: and(succeeded(), eq(variables['RENEW_CERT_ENV'], 'TEST'))
@@ -106,17 +141,9 @@ jobs:
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
 
-      # 5. Import the certificate into Azure Key Vault
+      # 5.2 Import the certificate into Azure Key Vault in TEST env
       - task: AzurePowerShell@4
         displayName: 'TEST - Import Certificate into Key Vault'
-        inputs:
-          azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
-          scriptType: 'FilePath'
-          scriptPath: 'Import-AcmeCertificateToKeyVault.ps1 '
-          scriptArguments: '-CertificateNames "$(TEST_CertificateNames)" -KeyVaultResourceId "$(TEST_KeyVaultResourceId)"'
-          errorActionPreference: 'stop'
-          failOnStandardError: true
-          azurePowerShellVersion: 'LatestVersion'
         condition:
           and(
             succeeded(),
@@ -125,14 +152,21 @@ jobs:
               eq(variables['RENEW_CERT_ENV'], 'TEST')
             )
           )
-
+        inputs:
+          azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
+          scriptType: 'FilePath'
+          scriptPath: 'Import-AcmeCertificateToKeyVault.ps1 '
+          scriptArguments: '-CertificateNames "$(TEST_CertificateNames)" -KeyVaultResourceId "$(TEST_KeyVaultResourceId)"'
+          errorActionPreference: 'stop'
+          failOnStandardError: true
+          azurePowerShellVersion: 'LatestVersion'
 
 
 
       - pwsh: |
           ./azcopy --version
         displayName: 'azcopy --version' 
-        condition: true
+        condition: false
 
       - task: AzurePowerShell@4
         condition: false
