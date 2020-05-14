@@ -34,7 +34,7 @@ parameters:
       - PRODUCTION
 
   - name: 'FORCE'
-    displayName: 'Force the renewal:'
+    displayName: 'Force the renewal'
     type: boolean
     default: False
     values:
