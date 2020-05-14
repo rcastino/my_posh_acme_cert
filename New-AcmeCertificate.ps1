@@ -48,12 +48,11 @@ $paPluginArgs = @{
     AZSubscriptionId = $azureContext.Subscription.Id
     AZAccessToken    = $azureAccessToken;
 }
-if ($ForceRenewal -eq $null) {
-    New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs
+if ($ForceRenewal -eq "true") {
+    New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs -Force
 }
 elseif
-    # Force the renewal
-    New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs -Force
+    New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs
 }
 # Sync working directory back to storage container
 ./azcopy sync "$workingDirectory" "$StorageContainerSASToken"
