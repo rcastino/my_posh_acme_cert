@@ -33,6 +33,14 @@ parameters:
       - TEST  
       - PRODUCTION
 
+  - name: 'FORCE'
+    displayName: 'Force the renewal:'
+    type: string
+    default: "$FALSE"
+    values:
+      - "$FALSE"  
+      - "$TRUE"
+
 variables:
   - name: RENEW_CERT_ENV
     value: ${{ parameters.ENVIRONMENT }}
@@ -81,7 +89,7 @@ jobs:
           azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
           scriptType: 'FilePath'
           scriptPath: 'New-AcmeCertificate.ps1 '
-          scriptArguments: '-AcmeDirectory "$(PRODUCTION_AcmeDirectory)" -AcmeContact "$(PRODUCTION_AcmeContact)" -CertificateNames "$(PRODUCTION_CertificateNames)" -StorageContainerSASToken "$(PRODUCTION_StorageContainerSASToken)" -ForceRenewal "$(PRODUCTION_ForceRenewal)"'
+          scriptArguments: '-AcmeDirectory "$(PRODUCTION_AcmeDirectory)" -AcmeContact "$(PRODUCTION_AcmeContact)" -CertificateNames "$(PRODUCTION_CertificateNames)" -StorageContainerSASToken "$(PRODUCTION_StorageContainerSASToken)" -ForceRenewal "${{ parameters.FORCE }}"'
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
@@ -115,7 +123,7 @@ jobs:
           azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
           scriptType: 'FilePath'
           scriptPath: 'New-AcmeCertificate.ps1 '
-          scriptArguments: '-AcmeDirectory "$(TEST_AcmeDirectory)" -AcmeContact "$(TEST_AcmeContact)" -CertificateNames "$(TEST_CertificateNames)" -StorageContainerSASToken "$(TEST_StorageContainerSASToken)" -ForceRenewal "$(TEST_ForceRenewal)"'
+          scriptArguments: '-AcmeDirectory "$(TEST_AcmeDirectory)" -AcmeContact "$(TEST_AcmeContact)" -CertificateNames "$(TEST_CertificateNames)" -StorageContainerSASToken "$(TEST_StorageContainerSASToken)" -ForceRenewal "${{ parameters.FORCE }}"'
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
