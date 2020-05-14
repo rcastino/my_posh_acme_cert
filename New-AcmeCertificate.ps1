@@ -47,7 +47,7 @@ $paPluginArgs = @{
     AZSubscriptionId = $azureContext.Subscription.Id
     AZAccessToken    = $azureAccessToken;
 }
-New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs
+New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs -Force
 
 # Sync working directory back to storage container
 ./azcopy sync "$workingDirectory" "$StorageContainerSASToken"
