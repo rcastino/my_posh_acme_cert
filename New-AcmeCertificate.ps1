@@ -51,7 +51,7 @@ $paPluginArgs = @{
 if ($ForceRenewal -eq "true") {
     New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs -Force
 }
-elseif
+else {
     New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs
 }
 # Sync working directory back to storage container
