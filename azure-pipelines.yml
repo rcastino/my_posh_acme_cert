@@ -34,7 +34,7 @@ parameters:
       - PRODUCTION
 
   - name: 'FORCE'
-    displayName: 'Force the renewal'
+    displayName: 'force certificate to be renewed'
     type: boolean
     default: False
     values:
