@@ -3,7 +3,6 @@ param (
     [string] $AcmeContact,
     [string] $CertificateNames,
     [string] $StorageContainerSASToken
-    [string] $ForceRenewal
 )
 
 # Supress progress messages. Azure DevOps doesn't format them correctly (used by New-PACertificate)
@@ -48,7 +47,7 @@ $paPluginArgs = @{
     AZSubscriptionId = $azureContext.Subscription.Id
     AZAccessToken    = $azureAccessToken;
 }
-New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs $ForceRenewal
+New-PACertificate -Domain $CertificateNamesArr -DnsPlugin Azure -PluginArgs $paPluginArgs
 
 # Sync working directory back to storage container
 ./azcopy sync "$workingDirectory" "$StorageContainerSASToken"
