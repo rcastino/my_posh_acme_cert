@@ -35,11 +35,11 @@ parameters:
 
   - name: 'FORCE'
     displayName: 'Force the renewal:'
-    type: string
-    default: "$FALSE"
+    type: boolean
+    default: False
     values:
-      - "$FALSE"  
-      - "$TRUE"
+      - False  
+      - True
 
 variables:
   - name: RENEW_CERT_ENV
