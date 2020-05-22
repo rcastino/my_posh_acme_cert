@@ -127,7 +127,7 @@ if (Test-Path -Path $accountJsonPath) {
     # If we have a different account data from Key Vault, update it
     if ($currentAccountData -and ($currentAccountData -ne $accountDataFromKv)) {
         Write-Debug "Updating acct.json content to secret in key vault..."
-        Set-AzKeyVaultSecret -VaultName $keyVaultResource.Name -SecretName $azureKeyVaultAccountName -SecretValue (ConvertTo-SecureString $currentAccountData -force -AsPlainText)
+        Set-AzKeyVaultSecret -VaultName $keyVaultResource.Name -SecretName $azureKeyVaultAccountName -SecretValue (ConvertTo-SecureString $currentAccountData -force -AsPlainText) | Out-Null
     }
 }
 
@@ -139,6 +139,6 @@ if (Test-Path -Path $orderJsonPath) {
     # If we have a different order data from Key Vault, update it
     if ($orderData -ne $currentOrderData) {
         Write-Debug "Updating order.json content to secret in key vault..."
-        Set-AzKeyVaultSecret -VaultName $keyVaultResource.Name -SecretName $azureKeyVaultOrderName -SecretValue (ConvertTo-SecureString $currentOrderData -force -AsPlainText)
+        Set-AzKeyVaultSecret -VaultName $keyVaultResource.Name -SecretName $azureKeyVaultOrderName -SecretValue (ConvertTo-SecureString $currentOrderData -force -AsPlainText) | Out-Null
     }
 }
