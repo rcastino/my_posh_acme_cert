@@ -18,15 +18,12 @@
 # - PRODUCTION_AcmeDirectory: LE_STAGE | LE_PROD
 # - PRODUCTION_CertificateNames: comma-separated list of domain names 
 # - PRODUCTION_KeyVaultResourceId: resource ID of the key vault 
-# - PRODUCTION_StorageContainerSASToken: SAS token for the storage container
 #
 # - TEST_AZURE_SUBSCRIPTION: service connection name for test only
 # - TEST_AcmeContact: email which should be notified before cert expire
 # - TEST_AcmeDirectory: LE_STAGE | LE_PROD
 # - TEST_CertificateNames: comma-separated list of domain names 
 # - TEST_KeyVaultResourceId: resource ID of the key vault 
-# - TEST_StorageContainerSASToken: SAS token for the storage container
-#
 
 parameters:
   - name: 'ENVIRONMENT'
@@ -67,14 +64,7 @@ jobs:
           targetType: 'inline'
           script: '$id = "$(Build.BuildId)"; $date = Get-Date -Format "yyyy.MMdd"; Write-Host "##vso[build.updatebuildnumber]$date.$id"'
 
-      # 2. Install AzCopy v10 (min version required: build agents run an older version)
-      - task: Bash@3
-        displayName: "Install AzCopy v10"
-        inputs:
-          targetType: 'inline'
-          script: 'wget https://azcopyvnext.azureedge.net/release20200501/azcopy_linux_amd64_10.4.3.tar.gz && tar xvzf ./azcopy_linux_amd64_10.4.3.tar.gz && rm ./azcopy_linux_amd64_10.4.3.tar.gz && cp ./azcopy_linux_amd64_10.4.3/azcopy ./ && rm -rf ./azcopy_linux_amd64_10.4.3 && ./azcopy --version'
-
-      # 3. Install the Az PowerShell modules our script will need
+      # 2. Install the Az PowerShell modules our script will need
       - task: PowerShell@2
         displayName: Install PowerShell Modules (Az.Accounts, Az.KeyVault, Az.Resources, Posh-ACME)
         inputs:
@@ -84,8 +74,7 @@ jobs:
           failOnStderr: true
           pwsh: true
 
-
-      # 4.1 Order or renew a certificate via ACME in PRODUCTION env
+      # 3.1 Order or renew a certificate via ACME in PRODUCTION env
       - task: AzurePowerShell@4
         displayName: 'PROD - Order or Renew Certificate'
         condition: and(succeeded(), eq(variables['RENEW_CERT_ENV'], 'PRODUCTION'))
@@ -93,12 +82,12 @@ jobs:
           azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
           scriptType: 'FilePath'
           scriptPath: 'New-AcmeCertificate.ps1 '
-          scriptArguments: '-AcmeDirectory "$(PRODUCTION_AcmeDirectory)" -AcmeContact "$(PRODUCTION_AcmeContact)" -CertificateNames "$(PRODUCTION_CertificateNames)" -StorageContainerSASToken "$(PRODUCTION_StorageContainerSASToken)" -ForceRenewal "${{ parameters.FORCE }}"'
+          scriptArguments: '-AcmeDirectory "$(PRODUCTION_AcmeDirectory)" -AcmeContact "$(PRODUCTION_AcmeContact)" -CertificateNames "$(PRODUCTION_CertificateNames)" -KeyVaultResourceId "$(PRODUCTION_KeyVaultResourceId)" -ForceRenewal "${{ parameters.FORCE }}"'
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
 
-      # 4.2 Import the certificate into Azure Key Vault in PRODUCTION env
+      # 3.2 Import the certificate into Azure Key Vault in PRODUCTION env
       - task: AzurePowerShell@4
         displayName: 'PROD - Import Certificate into Key Vault'
         condition:
@@ -119,7 +108,7 @@ jobs:
           azurePowerShellVersion: 'LatestVersion'
 
 
-      # 5.1 Order or renew a certificate via ACME in TEST env
+      # 4.1 Order or renew a certificate via ACME in TEST env
       - task: AzurePowerShell@4
         displayName: 'TEST - Order or Renew Certificate'
         condition: and(succeeded(), eq(variables['RENEW_CERT_ENV'], 'TEST'))
@@ -127,12 +116,12 @@ jobs:
           azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
           scriptType: 'FilePath'
           scriptPath: 'New-AcmeCertificate.ps1 '
-          scriptArguments: '-AcmeDirectory "$(TEST_AcmeDirectory)" -AcmeContact "$(TEST_AcmeContact)" -CertificateNames "$(TEST_CertificateNames)" -StorageContainerSASToken "$(TEST_StorageContainerSASToken)" -ForceRenewal "${{ parameters.FORCE }}"'
+          scriptArguments: '-AcmeDirectory "$(TEST_AcmeDirectory)" -AcmeContact "$(TEST_AcmeContact)" -CertificateNames "$(TEST_CertificateNames)" -KeyVaultResourceId "$(TEST_KeyVaultResourceId)" -ForceRenewal "${{ parameters.FORCE }}"'
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
 
-      # 5.2 Import the certificate into Azure Key Vault in TEST env
+      # 4.2 Import the certificate into Azure Key Vault in TEST env
       - task: AzurePowerShell@4
         displayName: 'TEST - Import Certificate into Key Vault'
         condition:
@@ -151,61 +140,3 @@ jobs:
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
-
-
-
-
-
-
-
-
-
-      - bash: |
-          echo "##vso[task.setvariable variable=TEST_AZURE_SUBSCRIPTION]$TEST_ACMECONTACT"
-        displayName: 'SET' 
-        condition: false
-
-      - bash: |
-          echo $env:TEST_AZURE_SUBSCRIPTION
-          echo $(TEST_AZURE_SUBSCRIPTION)
-          echo $TEST_AZURE_SUBSCRIPTION
-        displayName: 'PRINT' 
-        condition: false
-
-
-      - pwsh: |
-          ./azcopy --version
-        displayName: 'azcopy --version' 
-        condition: false
-
-      - task: AzurePowerShell@4
-        condition: false
-        displayName: Get all Certificate using PowerShell cmdlet
-        inputs:
-          azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
-          ScriptType: 'InlineScript'
-          Inline: 'Get-AzKeyVaultCertificate -VaultName "kv-rayshark-acmecerts" -Name "*"'
-          azurePowerShellVersion: 'LatestVersion'
-
-      # Azure Key Vault
-      # Download Azure Key Vault secrets
-      - task: AzureKeyVault@1
-        displayName: Get all Certificate using task
-        condition: false
-        inputs:
-          azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
-          keyVaultName: 'kv-rayshark-acmecerts'
-          secretsFilter: '*'
-
-      - pwsh: |
-          echo $(io-ainzara-it)
-          #$kvSecretBytes = [System.Convert]::FromBase64String($(PfxSecret))
-          #$certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-          #$certCollection.Import($kvSecretBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
-        displayName: 'ECHO io-ainzara-it' 
-        condition: false
-
-
-
-
-
