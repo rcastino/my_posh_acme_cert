@@ -85,7 +85,7 @@ $orderJsonPath = Join-Path -Path $orderDirectoryPath -ChildPath "order.json"
 
 # Get the current certificate order file content from key vault (if any):
 # the secret name is "acme-le-stage-<certName>-order-json" | "acme-le-prod-<certName>-order-json"
-$azureKeyVaultOrderName = "acme-le-stage-" + $certificateName.Replace(".", "-").Replace("!", "wildcard") + "-order-json"
+$azureKeyVaultOrderName = $azureKeyVaultSecretPrefix + "-" + $certificateName.Replace(".", "-").Replace("!", "wildcard") + "-order-json"
 if ($isNewAccount -eq $false) {
     # If we have an available order in key vault, copy it to local order.json file
     # only if that certificate order was generated with current ACME account;
