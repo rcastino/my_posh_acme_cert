@@ -109,11 +109,11 @@ jobs:
             echo "1-------"
             echo $env:PSModulePath
             echo "2-------"
-            echo $myOutputVar
+            echo $(myOutputVar)
             echo "3-------"
             Get-Module -ListAvailable -Verbose posh-acme
             echo "4-------"
-            echo $env:myOutputVar
+            echo $(env:myOutputVar)
           errorActionPreference: 'stop'
           failOnStderr: true
           pwsh: true
