@@ -45,6 +45,8 @@ parameters:
 variables:
   - name: RENEW_CERT_ENV
     value: ${{ parameters.ENVIRONMENT }}
+  - name: PSModulePath
+    value: $(PSModulePath):./pwsh_modules    
 
 # Linux based agent; all except the first step will also work on Windows
 pool:
