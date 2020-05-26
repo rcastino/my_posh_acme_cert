@@ -88,7 +88,9 @@ jobs:
             ls ./pwsh_modules/Posh-ACME
             echo "3-------"
             Get-Module -ListAvailable -Verbose posh-acme
+            echo "4-------"
             Write-Host "##vso[task.setvariable variable=PSModulePath]$env:PSModulePath"
+            echo "5-------"
           errorActionPreference: 'stop'
           failOnStderr: true
           pwsh: true
