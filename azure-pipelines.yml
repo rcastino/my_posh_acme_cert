@@ -82,6 +82,11 @@ jobs:
           script: |
             Expand-Archive -LiteralPath (Resolve-Path "./Packages/*.nupkg" | Select -ExpandProperty Path) -DestinationPath ./pwsh_modules/Posh-ACME
             $env:PSModulePath += ":./pwsh_modules"
+
+            echo $env:PSModulePath
+            ls ./pwsh_modules/Posh-ACME
+            echo "-------"
+            Get-Module -ListAvailable -Verbose posh-acme
           errorActionPreference: 'stop'
           failOnStderr: true
           pwsh: true
