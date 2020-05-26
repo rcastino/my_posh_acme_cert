@@ -45,8 +45,6 @@ parameters:
 variables:
   - name: RENEW_CERT_ENV
     value: ${{ parameters.ENVIRONMENT }}
-  - name: PSModulePath2
-    value: /home/vsts/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:./pwsh_modules    
 
 # Linux based agent; all except the first step will also work on Windows
 pool:
@@ -69,7 +67,6 @@ jobs:
       # 2. Install the Az PowerShell modules our script will need (Az.Accounts, Az.KeyVault, Az.Resources)
       - task: PowerShell@2
         displayName: Install Az Modules
-        condition: false
         inputs:
           targetType: 'inline'
           script: 'Install-Module Az.Accounts, Az.KeyVault, Az.Resources'
@@ -85,43 +82,11 @@ jobs:
           script: |
             Expand-Archive -LiteralPath (Resolve-Path "./Packages/*.nupkg" | Select -ExpandProperty Path) -DestinationPath ./pwsh_modules/Posh-ACME
             $env:PSModulePath += ":./pwsh_modules"
-            echo "1-------"
-            echo $env:PSModulePath
-            echo "2-------"
-            ls ./pwsh_modules/Posh-ACME
-            echo "3-------"
-            Get-Module -ListAvailable -Verbose posh-acme
-            echo "4-------"
             echo "##vso[task.setvariable variable=PSModulePath]$env:PSModulePath"
-            echo "5-------"
-          errorActionPreference: 'stop'
-          failOnStderr: true
-          pwsh: true
-
-      - powershell: echo "##vso[task.setvariable variable=myOutputVar]this is the value"
-  
-      - script: echo $(myOutputVar)
-
-      - task: PowerShell@2
-        displayName: PRINT
-        inputs:
-          targetType: 'inline'
-          script: |
-            echo "1-------"
-            echo $env:PSModulePath
-            echo "2-------"
-            echo $(myOutputVar)
-            echo "3-------"
             Get-Module -ListAvailable -Verbose posh-acme
-            echo "4-------"
           errorActionPreference: 'stop'
           failOnStderr: true
           pwsh: true
-        env:
-          PSModulePath: $(PSModulePath)
-
-
-
 
       # 4.1 Order or renew a certificate via ACME in PRODUCTION env
       - task: AzurePowerShell@4
@@ -135,6 +100,8 @@ jobs:
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
+        env:
+          PSModulePath: $(PSModulePath)
 
       # 4.2 Import the certificate into Azure Key Vault in PRODUCTION env
       - task: AzurePowerShell@4
@@ -155,6 +122,8 @@ jobs:
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
+        env:
+          PSModulePath: $(PSModulePath)
 
       # 5.1 Order or renew a certificate via ACME in TEST env
       - task: AzurePowerShell@4
@@ -168,6 +137,8 @@ jobs:
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
+        env:
+          PSModulePath: $(PSModulePath)
 
       # 5.2 Import the certificate into Azure Key Vault in TEST env
       - task: AzurePowerShell@4
@@ -188,3 +159,5 @@ jobs:
           errorActionPreference: 'stop'
           failOnStandardError: true
           azurePowerShellVersion: 'LatestVersion'
+        env:
+          PSModulePath: $(PSModulePath)
