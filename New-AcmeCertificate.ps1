@@ -32,7 +32,6 @@ $azureAccessToken = $currentAzureProfileClient.AcquireAccessToken($azureContext.
 
 # Set Posh-ACME working directory
 $env:POSHACME_HOME = $workingDirectory
-Import-Module Posh-ACME -Force
 
 # Configure Posh-ACME server and retrieve the server name
 Set-PAServer -DirectoryUrl $AcmeDirectory
