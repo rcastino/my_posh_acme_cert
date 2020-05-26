@@ -69,6 +69,7 @@ jobs:
       # 2. Install the Az PowerShell modules our script will need (Az.Accounts, Az.KeyVault, Az.Resources)
       - task: PowerShell@2
         displayName: Install Az Modules
+        condition: false
         inputs:
           targetType: 'inline'
           script: 'Install-Module Az.Accounts, Az.KeyVault, Az.Resources'
@@ -113,10 +114,11 @@ jobs:
             echo "3-------"
             Get-Module -ListAvailable -Verbose posh-acme
             echo "4-------"
-            echo $(env:myOutputVar)
           errorActionPreference: 'stop'
           failOnStderr: true
           pwsh: true
+        env:
+          PSModulePath: $(PSModulePath)
 
 
 
