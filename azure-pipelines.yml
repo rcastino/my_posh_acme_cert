@@ -97,6 +97,9 @@ jobs:
           failOnStderr: true
           pwsh: true
 
+      - powershell: echo "##vso[task.setvariable variable=myOutputVar]this is the value"
+  
+      - script: echo $(myOutputVar)
 
       - task: PowerShell@2
         displayName: PRINT
