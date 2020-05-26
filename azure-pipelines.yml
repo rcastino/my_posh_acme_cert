@@ -82,14 +82,35 @@ jobs:
           script: |
             Expand-Archive -LiteralPath (Resolve-Path "./Packages/*.nupkg" | Select -ExpandProperty Path) -DestinationPath ./pwsh_modules/Posh-ACME
             $env:PSModulePath += ":./pwsh_modules"
-
+            echo "1-------"
             echo $env:PSModulePath
+            echo "2-------"
             ls ./pwsh_modules/Posh-ACME
-            echo "-------"
+            echo "3-------"
             Get-Module -ListAvailable -Verbose posh-acme
           errorActionPreference: 'stop'
           failOnStderr: true
           pwsh: true
+
+
+      - task: PowerShell@2
+        displayName: PRINT
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "1-------"
+            echo $env:PSModulePath
+            echo "2-------"
+            echo $PSModulePath
+            ls ./pwsh_modules/Posh-ACME
+            echo "3-------"
+            Get-Module -ListAvailable -Verbose posh-acme
+          errorActionPreference: 'stop'
+          failOnStderr: true
+          pwsh: true
+
+
+
 
       # 4.1 Order or renew a certificate via ACME in PRODUCTION env
       - task: AzurePowerShell@4
